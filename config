@@ -1,0 +1,34 @@
+_STREAM_IPDB_SRCS="\
+    $ngx_addon_dir/ngx_stream_ipdb_module.c \
+    $ngx_addon_dir/ipdb/ipdb.c \
+"
+_STREAM_JSON_LIB="-ljson-c"
+ngx_addon_name=ngx_stream_ipdb_module
+
+ngx_feature="json-c library"
+ngx_feature_name="NGX_JSON_C"
+ngx_feature_run=no
+ngx_feature_incs="#include <json-c/json.h>"
+ngx_feature_path=
+ngx_feature_libs="$_STREAM_JSON_LIB"
+ngx_feature_test="json_c_version_num()"
+. auto/feature
+
+if [ $ngx_found = yes ]; then
+
+    if test -n "ngx_module_link"; then
+        ngx_module_type=STREAM
+        ngx_module_name=$ngx_addon_name
+        ngx_module_srcs="$_STREAM_IPDB_SRCS"
+        ngx_module_libs="$_STREAM_JSON_LIB"
+        . auto/module
+    else
+        STREAM_MODULES="$STREAM_MODULES $ngx_addon_name"
+        NGX_ADDON_SRCS="$NGX_ADDON_SRCS $_STREAM_IPDB_SRCS"
+        CORE_LIBS="$CORE_LIBS $_STREAM_JSON_LIB"
+        HTTP_INCS="$HTTP_INCS $ngx_addon_dir"
+    fi
+
+else
+    echo "warning: $ngx_addon_name invalid. please yum install json-c"
+fi
