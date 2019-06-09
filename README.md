@@ -34,11 +34,46 @@ The module is currently in active development.
 Install
 =======
 
+```sh
+# install json-c lib
+# centos
+yum install json-c-devel -y
+#or mac OSX
+brew install json-c
+
+configure --prefix=/usr/local/nginx --add-module=./github.com/vislee/ngx_stream_ipdb_module
+# or dynamic compile
+configure --prefix=/usr/local/nginx --add-dynamic-module=./github.com/vislee/ngx_stream_ipdb_module --with-compat
+```
+
+The following information is success:
+
+ >> checking for json-c library ... found
+ >>  + ngx_stream_ipdb_module was configured
+
 
 [Back to TOC](#table-of-contents)
 
 Example Configuration
 ====================
+
+```nginx
+
+# load_module modules/ngx_stream_ipdb_module.so;
+
+stream {
+    ipdb conf/ipiptest.ipdb;
+    ipdb_language "CN";
+
+    server {
+        listen 8091;
+        # ipdb_language EN;
+
+        return "country_name:$ipdb_country_name, raw_info:$ipdb_raw";
+    }
+}
+
+```
 
 [Back to TOC](#table-of-contents)
 
