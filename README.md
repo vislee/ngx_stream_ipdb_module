@@ -1,6 +1,10 @@
 Name
 ====
 
+
+[![Build Status](https://travis-ci.org/vislee/ngx_stream_ipdb_module.svg?branch=master)](https://travis-ci.org/vislee/ngx_stream_ipdb_module)
+[![Coverage Status](https://coveralls.io/repos/github/vislee/ngx_stream_ipdb_module/badge.svg?branch=master)](https://coveralls.io/github/vislee/ngx_stream_ipdb_module?branch=master)
+
 ngx_stream_ipdb_module - creates variables with values depending on the client IP address, using the precompiled [ipip.net](https://www.ipip.net) [ipdb](https://www.ipip.net/ipdb/test).
 
 
