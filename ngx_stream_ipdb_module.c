@@ -56,7 +56,7 @@ static ngx_command_t  ngx_stream_ipdb_commands[] = {
       NULL },
 
     { ngx_string("ipdb_language"),
-      NGX_STREAM_MAIN_CONF|NGX_CONF_TAKE1,
+      NGX_STREAM_MAIN_CONF|NGX_STREAM_SRV_CONF|NGX_CONF_TAKE1,
       ngx_conf_set_str_slot,
       NGX_STREAM_SRV_CONF_OFFSET,
       offsetof(ngx_stream_ipdb_srv_conf_t, lang),
@@ -359,6 +359,10 @@ ngx_stream_ipdb_variable(ngx_stream_session_t *s,
     ngx_stream_ipdb_srv_conf_t   *iscf;
     ngx_stream_ipdb_main_conf_t  *imcf;
 
+#if (NGX_DEBUG)
+    ngx_str_t               debug;
+#endif
+
     imcf = ngx_stream_get_module_main_conf(s, ngx_stream_ipdb_module);
 
     if (imcf == NULL || imcf->ipdb == NULL) {
@@ -373,11 +377,18 @@ ngx_stream_ipdb_variable(ngx_stream_session_t *s,
     err = ngx_stream_ipdb_item_by_addr(imcf->ipdb, &addr,
             (const char *)iscf->lang.data, body);
     if (err) {
-        ngx_log_debug1(NGX_LOG_DEBUG_HTTP, r->connection->log, 0,
-        "ngx_http_ipdb_variable, ipdb find error: %d", err);
+        ngx_log_debug1(NGX_LOG_DEBUG_STREAM, s->connection->log, 0,
+        "ngx_stream_ipdb_variable, ipdb find error: %d", err);
 
         goto not_found;
     }
+
+#if (NGX_DEBUG)
+    debug.len = ngx_strlen(body);
+    debug.data = (u_char *)body;
+    ngx_log_debug1(NGX_LOG_DEBUG_STREAM, s->connection->log, 0,
+        "ngx_stream_ipdb_variable, item: \"%V\"", &debug);
+#endif
 
     p = ngx_stream_ipdb_get_index_item(body, data);
     if (p == NULL) {
