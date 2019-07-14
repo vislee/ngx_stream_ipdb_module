@@ -2,11 +2,12 @@
  * Copyright (C) vislee
  */
 
-#include <ngx_config.h>
-#include <ngx_core.h>
-#include <ngx_stream.h>
+#include "ngx_http_ipdb_module.h"
 
-#include "ipdb/ipdb.h"
+#ifdef NGX_STREAM_IPDB_LUA
+#include <ngx_stream_ipdb_lua.h>
+#endif
+
 
 #define NGX_IPDB_country_name    0
 #define NGX_IPDB_region_name     1
@@ -19,18 +20,9 @@
 #define NGX_IPDB_raw             20
 
 
-typedef struct {
-    ipdb_reader    *ipdb;
-} ngx_stream_ipdb_main_conf_t;
-
-
-typedef struct {
-    ngx_str_t       lang;
-} ngx_stream_ipdb_srv_conf_t;
-
-
 static ngx_int_t ngx_stream_ipdb_variable(ngx_stream_session_t *s,
     ngx_stream_variable_value_t *v, uintptr_t data);
+static ngx_int_t ngx_stream_ipdb_init(ngx_conf_t *cf);
 static ngx_int_t ngx_stream_ipdb_add_variables(ngx_conf_t *cf);
 static char *ngx_stream_ipdb_language(ngx_conf_t *cf, void *post, void *data);
 static void *ngx_stream_ipdb_create_main_conf(ngx_conf_t *cf);
@@ -68,7 +60,7 @@ static ngx_command_t  ngx_stream_ipdb_commands[] = {
 
 static ngx_stream_module_t  ngx_stream_ipdb_module_ctx = {
     ngx_stream_ipdb_add_variables,        /* preconfiguration */
-    NULL,                                 /* postconfiguration */
+    ngx_stream_ipdb_init,                 /* postconfiguration */
 
     ngx_stream_ipdb_create_main_conf,     /* create main configuration */
     NULL,                                 /* init main configuration */
@@ -136,6 +128,19 @@ ngx_stream_ipdb_add_variables(ngx_conf_t *cf)
 
     return NGX_OK;
 }
+
+
+static ngx_int_t
+ngx_stream_ipdb_init(ngx_conf_t *cf)
+{
+
+#ifdef NGX_STREAM_IPDB_LUA
+    return ngx_stream_ipdb_lua_preload(cf);
+#endif
+
+    return NGX_OK;
+}
+
 
 static void *
 ngx_stream_ipdb_create_main_conf(ngx_conf_t *cf)
@@ -265,7 +270,7 @@ ngx_stream_ipdb_get_index_item(char *v, ngx_int_t idx)
 }
 
 
-static ngx_int_t
+ngx_int_t
 ngx_stream_ipdb_item_by_addr(ipdb_reader *reader, ngx_addr_t *addr,
     const char *lang, char *body)
 {

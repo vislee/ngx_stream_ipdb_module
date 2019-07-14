@@ -2,6 +2,18 @@ _STREAM_IPDB_SRCS="\
     $ngx_addon_dir/ngx_stream_ipdb_module.c \
     $ngx_addon_dir/ipdb/ipdb.c \
 "
+_STREAM_IPDB_DRPS="\
+    $ngx_addon_dir/ngx_stream_ipdb_module.h \
+"
+
+ipdb_lua() {
+    echo " + ipdb module support lua"
+    have=NGX_STREAM_IPDB_LUA . auto/have
+    _STREAM_IPDB_SRCS="$_STREAM_IPDB_SRCS $ngx_addon_dir/ngx_stream_ipdb_lua.c"
+    _STREAM_IPDB_DRPS="$_STREAM_IPDB_DRPS $ngx_addon_dir/ngx_stream_ipdb_lua.h"
+}
+
+
 _STREAM_JSON_LIB="-ljson-c"
 ngx_addon_name=ngx_stream_ipdb_module
 
@@ -21,12 +33,19 @@ if [ $ngx_found = yes ]; then
         ngx_module_name=$ngx_addon_name
         ngx_module_srcs="$_STREAM_IPDB_SRCS"
         ngx_module_libs="$_STREAM_JSON_LIB"
+        ngx_module_deps="$_STREAM_IPDB_DRPS"
         . auto/module
     else
+
+        if $NGX_ADDON_DEPS | grep "ngx_stream_lua_api" > /dev/null; then
+            ipdb_lua
+        fi
+
         STREAM_MODULES="$STREAM_MODULES $ngx_addon_name"
         NGX_ADDON_SRCS="$NGX_ADDON_SRCS $_STREAM_IPDB_SRCS"
         CORE_LIBS="$CORE_LIBS $_STREAM_JSON_LIB"
         HTTP_INCS="$HTTP_INCS $ngx_addon_dir"
+        NGX_ADDON_DEPS="$NGX_ADDON_DEPS $_STREAM_IPDB_DRPS"
     fi
 
 else
