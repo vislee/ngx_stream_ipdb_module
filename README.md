@@ -52,7 +52,7 @@ configure --prefix=/usr/local/nginx --with-stream --add-module=./github.com/visl
 configure --prefix=/usr/local/nginx --with-stream --add-dynamic-module=./github.com/vislee/ngx_stream_ipdb_module --with-compat
 
 # or stream_lua
-configure --prefix=/usr/local/nginx --with-stream  --add-module=./github.com/openresty/stream-lua-nginx-module/ --add-module=./github.com/vislee/ngx_stream_ipdb_module --with-cc-opt='-I ./github.com/openresty/stream-lua-nginx-module/src'
+configure --prefix=/usr/local/nginx --with-stream --add-module=./github.com/openresty/stream-lua-nginx-module/ --add-module=./github.com/vislee/ngx_stream_ipdb_module --with-cc-opt='-I ./github.com/openresty/stream-lua-nginx-module/src'
 ```
 
 The following information is success:
@@ -175,6 +175,8 @@ get_raw
 **syntax:** ipdb_raw = ngx.stream.ipdb.get_raw(addr)
 
 **context:** content_by_lua*, log_by_lua*
+
+Get raw info for `addr` . for example, "中国\t内蒙古\t呼和浩特"，"China\tNei Mongol\tHohhot"
 
 
 [Back to TOC](#table-of-contents)
