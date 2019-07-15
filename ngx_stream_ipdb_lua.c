@@ -2,13 +2,21 @@
  * Copyright (C) vislee
  */
 
+#include <lualib.h>
+#include <lauxlib.h>
+
+#include "ngx_stream_ipdb_module.h"
 #include "ngx_stream_ipdb_lua.h"
 
+// #include "ngx_stream_lua_api.h"
+#include "ngx_stream_lua_request.h"
+#include "ngx_stream_lua_util.h"
 
 static int
-ngx_stream_ipdb_get(lua_State *L)
+ngx_stream_ipdb_get_raw(lua_State *L)
 {
     char                          body[512];
+    ngx_int_t                     err;
     ngx_str_t                     ip, v;
     ngx_addr_t                    addr;
     ngx_stream_lua_request_t     *r;
@@ -16,7 +24,7 @@ ngx_stream_ipdb_get(lua_State *L)
     ngx_stream_ipdb_main_conf_t  *imcf;
 
 
-    r = ngx_stream_lua_get_req(L);
+    r = ngx_stream_lua_get_request(L);
     if (r == NULL) {
         return luaL_error(L, "no request object found");
     }
@@ -30,7 +38,7 @@ ngx_stream_ipdb_get(lua_State *L)
 
     ip.data = (u_char *) luaL_checklstring(L, 1, &ip.len);
 
-    if (ngx_parse_addr(r->connection->pool, &addr, ip.data, ip.len) == NGX_OK) {
+    if (ngx_parse_addr(r->connection->pool, &addr, ip.data, ip.len) != NGX_OK) {
         return luaL_error(L, "bad addr format");
     }
 
@@ -43,9 +51,9 @@ ngx_stream_ipdb_get(lua_State *L)
     v.len = ngx_strlen(body);
     v.data = ngx_palloc(r->connection->pool, v.len);
     if (v.data == NULL) {
-        return luaL_error(L, "no mem");
+        return luaL_error(L, "no memory");
     }
-    ngx_memcpy(v.data, data, v.len);
+    ngx_memcpy(v.data, body, v.len);
 
     lua_pushlstring(L, (const char *) v.data, (size_t) v.len);
     return 1;
@@ -57,8 +65,8 @@ ngx_stream_ipdb_lua_register(lua_State *L)
 {
     lua_createtable(L, 0, 1);
 
-    lua_pushcfunction(L, ngx_stream_ipdb_get);
-    lua_setfield(L, -2, "get");
+    lua_pushcfunction(L, ngx_stream_ipdb_get_raw);
+    lua_setfield(L, -2, "get_raw");
 
     return 1;
 }

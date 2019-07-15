@@ -22,6 +22,7 @@ typedef struct {
 } ngx_stream_ipdb_srv_conf_t;
 
 
+ngx_module_t  ngx_stream_ipdb_module;
 
 ngx_int_t ngx_stream_ipdb_item_by_addr(ipdb_reader *reader, ngx_addr_t *addr,
     const char *lang, char *body);

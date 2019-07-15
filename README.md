@@ -23,6 +23,8 @@ Table of Contents
     * [$ipdb_city_name](#ipdb_city_name)
     * [$ipdb_isp_domain](#ipdb_isp_domain)
     * [$ipdb_raw](#ipdb_raw)
+* [Lua API](#lua_api)
+    * [get_raw](#get_raw)
 * [TODO](#todo)
 * [Author](#author)
 * [Copyright and License](#copyright-and-license)
@@ -45,9 +47,12 @@ yum install json-c-devel -y
 #or mac OSX
 brew install json-c
 
-configure --prefix=/usr/local/nginx --add-module=./github.com/vislee/ngx_stream_ipdb_module
+configure --prefix=/usr/local/nginx --with-stream --add-module=./github.com/vislee/ngx_stream_ipdb_module
 # or dynamic compile
-configure --prefix=/usr/local/nginx --add-dynamic-module=./github.com/vislee/ngx_stream_ipdb_module --with-compat
+configure --prefix=/usr/local/nginx --with-stream --add-dynamic-module=./github.com/vislee/ngx_stream_ipdb_module --with-compat
+
+# or stream_lua
+configure --prefix=/usr/local/nginx --with-stream  --add-module=./github.com/openresty/stream-lua-nginx-module/ --add-module=./github.com/vislee/ngx_stream_ipdb_module --with-cc-opt='-I ./github.com/openresty/stream-lua-nginx-module/src'
 ```
 
 The following information is success:
@@ -76,6 +81,22 @@ stream {
         return "country_name:$ipdb_country_name, raw_info:$ipdb_raw";
     }
 }
+
+stream {
+    ipdb conf/ipiptest.ipdb;
+    ipdb_language "CN";
+
+    server {
+        listen 8092;
+        # ipdb_language EN;
+
+        content_by_lua_block {
+            local sipdb = require "ngx.stream.ipdb";
+            ngx.say(sipdb.get_raw("127.0.0.1"));
+        }
+    }
+}
+
 
 ```
 
@@ -140,6 +161,20 @@ ipdb_raw
 --------
 
 $ipdb_raw - raw info, for example, "中国\t内蒙古\t呼和浩特"，"China\tNei Mongol\tHohhot"
+
+
+[Back to TOC](#table-of-contents)
+
+
+Lua API
+========
+
+get_raw
+-------
+
+**syntax:** ipdb_raw = ngx.stream.ipdb.get_raw(addr)
+
+**context:** content_by_lua*, log_by_lua*
 
 
 [Back to TOC](#table-of-contents)

@@ -2,10 +2,10 @@
  * Copyright (C) vislee
  */
 
-#include "ngx_http_ipdb_module.h"
+#include "ngx_stream_ipdb_module.h"
 
 #ifdef NGX_STREAM_IPDB_LUA
-#include <ngx_stream_ipdb_lua.h>
+#include "ngx_stream_ipdb_lua.h"
 #endif
 
 
