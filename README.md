@@ -80,15 +80,11 @@ stream {
 
         return "country_name:$ipdb_country_name, raw_info:$ipdb_raw";
     }
-}
 
-stream {
-    ipdb conf/ipiptest.ipdb;
-    ipdb_language "CN";
-
+    # stream_lua
     server {
         listen 8092;
-        # ipdb_language EN;
+        ipdb_language CN;
 
         content_by_lua_block {
             local sipdb = require "ngx.stream.ipdb";
@@ -96,7 +92,6 @@ stream {
         }
     }
 }
-
 
 ```
 
