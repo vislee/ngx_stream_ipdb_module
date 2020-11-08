@@ -24,7 +24,7 @@ ngx_stream_ipdb_get_raw(lua_State *L)
     ngx_stream_ipdb_main_conf_t  *imcf;
 
 
-    r = ngx_stream_lua_get_request(L);
+    r = ngx_stream_lua_get_req(L);
     if (r == NULL) {
         return luaL_error(L, "no request object found");
     }
